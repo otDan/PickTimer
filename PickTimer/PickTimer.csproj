@@ -40,8 +40,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="BepInEx">
-      <HintPath>C:\Users\ostas\Desktop\BepInEx\BepInEx\core\BepInEx.dll</HintPath>
+    <Reference Include="BepInEx, Version=5.4.17.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\ostas\AppData\Roaming\r2modmanPlus-local\ROUNDS\profiles\MyModdedTesting\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="CardChoiceSpawnUniqueCardPatch">
       <HintPath>C:\Users\ostas\AppData\Roaming\r2modmanPlus-local\ROUNDS\profiles\MyModdedTesting\BepInEx\plugins\Pykess-CardChoiceSpawnUniqueCardPatch\CardChoiceSpawnUniqueCardPatch.dll</HintPath>
@@ -83,29 +84,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Menu\MenuManager.cs" />
-    <Compile Include="Menu\Impl\EnemyMarker.cs" />
+    <Compile Include="Asset\AssetManager.cs" />
     <Compile Include="Menu\Impl\GeneralSettings.cs" />
-    <Compile Include="Menu\Impl\OwnMarker.cs" />
-    <Compile Include="Menu\Impl\TeamMarker.cs" />
+    <Compile Include="Menu\MenuManager.cs" />
     <Compile Include="PickTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\ConfigManager.cs" />
-    <Compile Include="Util\ObjectManager.cs" />
-    <Compile Include="Util\GameActions.cs" />
+    <Compile Include="Util\PickTimerHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <EmbeddedResource Include="Asset\picktimer_assets" />
     <None Include="manifest.json" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\bin\Debug\PlayerMarkers.dll" "C:\Users\ostas\AppData\Roaming\r2modmanPlus-local\ROUNDS\profiles\MyModdedTesting\BepInEx\plugins\Unknown-PlayerMarkers\PlayerMarkers.dll"
-copy /Y "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\bin\Debug\PlayerMarkers.dll" "C:\Users\ostas\Desktop\PM\PlayerMarkers.dll"
-copy /Y "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\icon.png" C:\Users\ostas\Desktop\PM\icon.png"
-copy /Y "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\manifest.json" C:\Users\ostas\Desktop\PM\manifest.json"
-copy /Y "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\README.md" C:\Users\ostas\Desktop\PM\README.md"
-call "E:\Projects\VisualStudio\Rounds\PlayerMarkers\PlayerMarkers\bin\Release\build.bat"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\bin\Debug\PickTimer.dll" "C:\Users\ostas\AppData\Roaming\r2modmanPlus-local\ROUNDS\profiles\MyModdedTesting\BepInEx\plugins\Unknown-PickTimer\PickTimer.dll"
+copy /Y "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\bin\Debug\PickTimer.dll" "C:\Users\ostas\Desktop\PickTimer\PickTimer.dll"
+copy /Y "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\icon.png" C:\Users\ostas\Desktop\PickTimer\icon.png"
+copy /Y "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\manifest.json" C:\Users\ostas\Desktop\PickTimer\manifest.json"
+copy /Y "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\README.md" C:\Users\ostas\Desktop\PickTimer\README.md"
+call "E:\Projects\VisualStudio\Rounds\PickTimer\PickTimer\bin\Release\build.bat"</PostBuildEvent>
   </PropertyGroup>
 </Project>
