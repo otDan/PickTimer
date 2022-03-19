@@ -21,15 +21,15 @@ namespace PickTimer
     {
         private const string ModId = "ot.dan.rounds.picktimer";
         private const string ModName = "Pick Timer";
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
         public const string ModInitials = "PT";
         private const string CompatibilityModName = "PickTimer";
-        public static PickTimer instance { get; private set; }
+        public static PickTimer Instance { get; private set; }
         public static int PickTimerTime;
 
         private void Awake()
         {
-            instance = this;
+            Instance = this;
             Unbound.RegisterClientSideMod(ModId);
 
             // Use this to call any harmony patch files your mod may have

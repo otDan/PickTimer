@@ -8,5 +8,8 @@
 </p>
 
 ## Versions
+- 1.0.1
+  - Fix debug log spam
+  - small ui improvement
 - 1.0.0
   - Initial release, straight up from competitive rounds

@@ -45,16 +45,21 @@ namespace PickTimer.Util
 
             while (Time.time < start + timeToWait)
             {
-                int timerTime = Mathf.CeilToInt(start + timeToWait - Time.time);
+                float timerTimerForProgress = start + timeToWait - Time.time;
+                int timerTime = Mathf.CeilToInt(timerTimerForProgress);
+                
                 _timerText.text = timerTime.ToString();
 
-                float progress = timerTime > 0 ? timerTime / (float) PickTimer.PickTimerTime : 0;
-                UnityEngine.Debug.Log($"Progress: {timerTime}/{PickTimer.PickTimerTime} value {progress}");
+                float progress = timerTime > 0 ? timerTimerForProgress / PickTimer.PickTimerTime : 0;
+                // UnityEngine.Debug.Log($"Progress: {timerTime}/{PickTimer.PickTimerTime} value {progress}");
                 _progressImage.fillAmount = progress;
-                if (Mathf.CeilToInt(start + timeToWait - Time.time) <= 5)
+                if (timerTime <= 3)
                 {
                     _timerText.color = Color.red;
-                    _timerText.text = "<b>" + _timerText.text + "</b>";
+                }
+                else if (timerTime <= 5)
+                {
+                    _timerText.color = Color.yellow;
                 }
                 yield return null;
             }
