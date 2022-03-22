@@ -101,7 +101,6 @@
     <Compile Include="Network\LobbyMonitor.cs" />
     <Compile Include="PickTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Ui\PickTimerLobbyUI.cs" />
     <Compile Include="Util\ConfigManager.cs" />
     <Compile Include="Util\GameHook.cs" />
     <Compile Include="Util\PickTimerHandler.cs" />

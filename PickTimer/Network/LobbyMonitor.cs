@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using System;
+using Photon.Pun;
 using PickTimer.Asset;
 using PickTimer.Util;
 using TMPro;
@@ -23,6 +24,7 @@ namespace PickTimer.Network
         {
             instance = this;
             InitializeLobbyTimerUi();
+            // GameHook.instance.RegisterHooks(this);
         }
 
         private void Update()
@@ -76,7 +78,7 @@ namespace PickTimer.Network
             LobbyTimerCanvas = GameObject.Find("/Game/UI/UI_Game/Canvas/");
 
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, LobbyTimerCanvas.transform, true);
-            _lobbyTimerUi.AddComponent<BringBgToTop>();
+            // _lobbyTimerUi.AddComponent<BringBgToTop>();
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
@@ -112,13 +114,13 @@ namespace PickTimer.Network
             _enabled = true;
         }
 
-        private class BringBgToTop : MonoBehaviour
-        {
-            private void OnTransformChildrenChanged()
-            {
-                this.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
-            }
-        }
+        // private class BringBgToTop : MonoBehaviour
+        // {
+        //     private void OnTransformChildrenChanged()
+        //     {
+        //         this.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
+        //     }
+        // }
 
         public override void OnLeftRoom()
         {
@@ -138,5 +140,10 @@ namespace PickTimer.Network
         public void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)
         {
         }
+
+        // private void OnDestroy()
+        // {
+        //     GameHook.instance.RemoveHooks(this);
+        // }
     }
 }
