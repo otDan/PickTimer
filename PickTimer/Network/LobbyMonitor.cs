@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections;
 using Photon.Pun;
 using PickTimer.Asset;
 using PickTimer.Util;
 using TMPro;
 using UnboundLib;
+using UnboundLib.GameModes;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = System.Collections.Hashtable;
 
 namespace PickTimer.Network
 {
-    public class LobbyMonitor : MonoBehaviourPunCallbacks, IGameStartHookHandler, IPickStartHookHandler
+    public class LobbyMonitor : MonoBehaviourPunCallbacks, IGameStartHookHandler
     {
         public static LobbyMonitor instance { get; private set; }
         private static bool _enabled;
@@ -23,8 +25,9 @@ namespace PickTimer.Network
         private void Awake()
         {
             instance = this;
+
             InitializeLobbyTimerUi();
-            // GameHook.instance.RegisterHooks(this);
+            GameHook.instance.RegisterHooks(this);
         }
 
         private void Start()
@@ -53,6 +56,9 @@ namespace PickTimer.Network
 
         public override void OnJoinedRoom()
         {
+            if (_lobbyTimerUi == null)
+                InitializeLobbyTimerUi();
+
             _lobbyTimerUi.SetActive(false);
             if (PhotonNetwork.OfflineMode) return;
 
@@ -88,7 +94,7 @@ namespace PickTimer.Network
             LobbyTimerCanvas = GameObject.Find("/Game/UI/UI_Game/Canvas/");
 
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, LobbyTimerCanvas.transform, true);
-            // _lobbyTimerUi.AddComponent<BringBgToTop>();
+            _lobbyTimerUi.AddComponent<BringBgToTop>();
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
@@ -124,13 +130,13 @@ namespace PickTimer.Network
             _enabled = true;
         }
 
-        // private class BringBgToTop : MonoBehaviour
-        // {
-        //     private void OnTransformChildrenChanged()
-        //     {
-        //         this.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
-        //     }
-        // }
+        private class BringBgToTop : MonoBehaviour
+        {
+            private void OnTransformChildrenChanged()
+            {
+                this.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
+            }
+        }
 
         public override void OnLeftRoom()
         {
@@ -141,19 +147,14 @@ namespace PickTimer.Network
         {
             _lobbyTimerUi.SetActive(false);
         }
-
-        public void OnPickStart()
-        {
-            _lobbyTimerUi.SetActive(false);
-        }
-
+        
         public void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)
         {
         }
 
-        // private void OnDestroy()
-        // {
-        //     GameHook.instance.RemoveHooks(this);
-        // }
+        private void OnDestroy()
+        {
+            GameHook.instance.RemoveHooks(this);
+        }
     }
 }
