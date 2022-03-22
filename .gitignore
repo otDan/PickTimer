@@ -392,3 +392,8 @@ FodyWeavers.xsd
 *.sln.iml
 
 PlayerMarkers/bin
+PickTimer/PickTimer.csproj
+PickTimer/packages.config
+PickTimer/PickTimer.csproj
+PickTimer/PickTimer.csproj
+PickTimer/PickTimer.csproj
