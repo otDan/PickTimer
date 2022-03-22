@@ -27,17 +27,11 @@ namespace PickTimer.Network
             instance = this;
 
             InitializeLobbyTimerUi();
-            GameHook.instance.RegisterHooks(this);
         }
 
         private void Start()
         {
             GameHook.instance.RegisterHooks(this);
-        }
-
-        private void OnDestroy()
-        {
-            GameHook.instance.RemoveHooks(this);
         }
 
         private void Update()
