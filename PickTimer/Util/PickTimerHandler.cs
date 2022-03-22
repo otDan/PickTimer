@@ -12,13 +12,13 @@ using Object = UnityEngine.Object;
 
 namespace PickTimer.Util
 {
-    internal static class PickTimerHandler
+    internal class PickTimerHandler : IPlayerPickEndHookHandler, IGameEndHookHandler
     {
-        private static readonly System.Random Random = new System.Random();
+        private static readonly System.Random Random = new();
         private static GameObject _timerUi;
         private static Image _progressImage;
         private static TextMeshProUGUI _timerText;
-        internal static GameObject timerCanvas;
+        internal static GameObject TimerCanvas;
         internal static Coroutine TimerCr;
 
         internal static IEnumerator StartPickTimer(CardChoice instance)
@@ -46,7 +46,7 @@ namespace PickTimer.Util
                 InitializeTimerUi();
             }
             _timerText.color = Color.white;
-            timerCanvas.SetActive(true);
+            TimerCanvas.SetActive(true);
 
             while (Time.time < start + timeToWait)
             {
@@ -68,15 +68,15 @@ namespace PickTimer.Util
                 }
                 yield return null;
             }
-            timerCanvas.SetActive(false);
+            TimerCanvas.SetActive(false);
         }
 
         private static void InitializeTimerUi()
         {
-            timerCanvas = new GameObject("TimerCanvas", typeof(Canvas));
-            timerCanvas.transform.SetParent(Unbound.Instance.canvas.transform);
+            TimerCanvas = new GameObject("TimerCanvas", typeof(Canvas));
+            TimerCanvas.transform.SetParent(Unbound.Instance.canvas.transform);
 
-            _timerUi = Object.Instantiate(AssetManager.TimerUI, timerCanvas.transform, true);
+            _timerUi = Object.Instantiate(AssetManager.TimerUI, TimerCanvas.transform, true);
             _timerText = _timerUi.GetComponentInChildren<TextMeshProUGUI>();
             _timerText.text = "";
             _timerText.fontSize = 200f;
@@ -86,32 +86,45 @@ namespace PickTimer.Util
 
             _progressImage = _timerUi.transform.Find("Timer/TimerFillImage").gameObject.GetComponent<Image>();
 
-            timerCanvas.transform.position = new Vector2(Screen.width / 2f, 150f);
-            timerCanvas.SetActive(false);
+            TimerCanvas.transform.position = new Vector2(Screen.width / 2f, 150f);
+            TimerCanvas.SetActive(false);
         }
 
-        internal static IEnumerator Cleanup(IGameModeHandler gm)
+        internal static void Cleanup()
         {
-            if (TimerHandler.timer != null) { Unbound.Instance.StopCoroutine(TimerHandler.timer); }
+            if (TimerHandler.Timer != null) { Unbound.Instance.StopCoroutine(TimerHandler.Timer); }
             if (TimerCr != null)
             {
                 Unbound.Instance.StopCoroutine(TimerCr);
             }
-            if (timerCanvas != null) { timerCanvas.SetActive(false); }
-            yield break;
+            if (TimerCanvas != null) { TimerCanvas.SetActive(false); }
+        }
+
+        public void OnPlayerPickEnd()
+        {
+            Cleanup();
+        }
+
+        public void OnGameEnd()
+        {
+            Cleanup();
         }
     }
-    internal static class TimerHandler
+    internal class TimerHandler : IPlayerPickStartHookHandler
     {
-        internal static Coroutine timer;
-        internal static IEnumerator Start(IGameModeHandler gm)
+        internal static Coroutine Timer;
+        internal static void Start()
         {
-            if (timer != null) { Unbound.Instance.StopCoroutine(timer); }
+            if (Timer != null) { Unbound.Instance.StopCoroutine(Timer); }
             if (PickTimer.PickTimerTime > 0)
             {
-                timer = Unbound.Instance.StartCoroutine(PickTimerHandler.StartPickTimer(CardChoice.instance));
+                Timer = Unbound.Instance.StartCoroutine(PickTimerHandler.StartPickTimer(CardChoice.instance));
             }
-            yield break;
+        }
+
+        public void OnPlayerPickStart()
+        {
+            Start();
         }
     }
     [Serializable]
@@ -120,17 +133,17 @@ namespace PickTimer.Util
     {
         private static void Postfix(CardChoice __instance)
         {
-            if (PickTimerHandler.timerCanvas != null && PickTimerHandler.timerCanvas.gameObject.activeInHierarchy)
+            if (PickTimerHandler.TimerCanvas != null && PickTimerHandler.TimerCanvas.gameObject.activeInHierarchy)
             {
-                PickTimerHandler.timerCanvas.gameObject.SetActive(false);
+                PickTimerHandler.TimerCanvas.gameObject.SetActive(false);
             }
             if (PickTimerHandler.TimerCr != null)
             {
                 Unbound.Instance.StopCoroutine(PickTimerHandler.TimerCr);
             }
-            if (TimerHandler.timer != null)
+            if (TimerHandler.Timer != null)
             {
-                __instance.StopCoroutine(TimerHandler.timer);
+                __instance.StopCoroutine(TimerHandler.Timer);
             }
         }
     }
