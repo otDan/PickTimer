@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Photon.Pun;
 using PickTimer.Menu;
+using PickTimer.Network;
 using PickTimer.Util;
 using UnboundLib;
 using UnboundLib.Cards;
@@ -21,7 +22,7 @@ namespace PickTimer
     {
         private const string ModId = "ot.dan.rounds.picktimer";
         private const string ModName = "Pick Timer";
-        public const string Version = "1.0.1";
+        public const string Version = "1.1.0";
         public const string ModInitials = "PT";
         private const string CompatibilityModName = "PickTimer";
         public static PickTimer Instance { get; private set; }
@@ -45,6 +46,9 @@ namespace PickTimer
 
             PickTimerTime = ConfigManager.PickTimerConfig.Value;
 
+            gameObject.AddComponent<GameHook>();
+            gameObject.AddComponent<LobbyMonitor>();
+
             GameModeManager.AddHook(GameModeHooks.HookPlayerPickStart, TimerHandler.Start);
             GameModeManager.AddHook(GameModeHooks.HookPlayerPickEnd, PickTimerHandler.Cleanup);
             GameModeManager.AddHook(GameModeHooks.HookGameEnd, PickTimerHandler.Cleanup);
@@ -57,11 +61,16 @@ namespace PickTimer
             ConfigManager.PickTimerConfig = Config.Bind(CompatibilityModName, "PickTimer", 0, "Pick Timer Time");
         }
 
+        public static void SyncTimer()
+        {
+            NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), PickTimerTime);
+        }
+
         private static void OnHandShakeCompleted()
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), PickTimerTime);
+                SyncTimer();   
             }
         }
 

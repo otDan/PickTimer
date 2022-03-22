@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -49,6 +51,15 @@
     </Reference>
     <Reference Include="ModdingUtils">
       <HintPath>C:\Users\ostas\AppData\Roaming\r2modmanPlus-local\ROUNDS\profiles\MyModdedTesting\BepInEx\plugins\Pykess-ModdingUtils\ModdingUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonChat">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\PhotonChat.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonRealtime">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\ROUNDS\Rounds_Data\Managed\PhotonRealtime.dll</HintPath>
     </Reference>
     <Reference Include="PhotonUnityNetworking, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="SonigonAudioEngine.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -87,9 +98,12 @@
     <Compile Include="Asset\AssetManager.cs" />
     <Compile Include="Menu\Impl\GeneralSettings.cs" />
     <Compile Include="Menu\MenuManager.cs" />
+    <Compile Include="Network\LobbyMonitor.cs" />
     <Compile Include="PickTimer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ui\PickTimerLobbyUI.cs" />
     <Compile Include="Util\ConfigManager.cs" />
+    <Compile Include="Util\GameHook.cs" />
     <Compile Include="Util\PickTimerHandler.cs" />
   </ItemGroup>
   <ItemGroup />

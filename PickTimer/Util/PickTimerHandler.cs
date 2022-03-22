@@ -27,10 +27,15 @@ namespace PickTimer.Util
             {
                 Unbound.Instance.StopCoroutine(TimerCr);
             }
+
             TimerCr = Unbound.Instance.StartCoroutine(Timer(PickTimer.PickTimerTime));
             yield return new WaitForSecondsRealtime(PickTimer.PickTimerTime);
-            instance.Pick(((List<GameObject>)Traverse.Create(instance).Field("spawnedCards").GetValue())[Random.Next(0, ((List<GameObject>)Traverse.Create(instance).Field("spawnedCards").GetValue()).Count)], false);
-            Traverse.Create(instance).Field("pickrID").SetValue(-1);
+
+            var traverse = Traverse.Create(instance);
+            var spawnedCards = (List<GameObject>) traverse.Field("spawnedCards").GetValue();
+
+            instance.Pick(spawnedCards [Random.Next(0, spawnedCards.Count)]);
+            traverse.Field("pickrID").SetValue(-1);
         }
 
         private static IEnumerator Timer(float timeToWait)
