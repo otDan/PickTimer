@@ -227,9 +227,7 @@ namespace PickTimer.Util
 
     internal interface IGameStartHookHandler
     {
-        public abstract Func<IGameModeHandler, IEnumerator> OnGameStart();
-        void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps);
-        void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps);
+        public abstract void OnGameStart();
     }
 
     internal interface IGameEndHookHandler
