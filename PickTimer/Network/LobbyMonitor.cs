@@ -27,6 +27,10 @@ namespace PickTimer.Network
             instance = this;
 
             InitializeLobbyTimerUi();
+        }
+
+        private void Start()
+        {
             GameHook.instance.RegisterHooks(this);
         }
 
@@ -85,6 +89,7 @@ namespace PickTimer.Network
 
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, LobbyTimerCanvas.transform, true);
             _lobbyTimerUi.AddComponent<BringBgToTop>();
+            PickTimer.Instance.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
