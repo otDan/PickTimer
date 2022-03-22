@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace PickTimer.Util
 {
-    internal class PickTimerHandler : IPlayerPickEndHookHandler, IGameEndHookHandler
+    internal static class PickTimerHandler
     {
         private static readonly System.Random Random = new();
         private static GameObject _timerUi;
@@ -90,7 +90,7 @@ namespace PickTimer.Util
             TimerCanvas.SetActive(false);
         }
 
-        internal static void Cleanup()
+        internal static IEnumerator Cleanup(IGameModeHandler gm)
         {
             if (TimerHandler.Timer != null) { Unbound.Instance.StopCoroutine(TimerHandler.Timer); }
             if (TimerCr != null)
@@ -98,33 +98,20 @@ namespace PickTimer.Util
                 Unbound.Instance.StopCoroutine(TimerCr);
             }
             if (TimerCanvas != null) { TimerCanvas.SetActive(false); }
-        }
-
-        public void OnPlayerPickEnd()
-        {
-            Cleanup();
-        }
-
-        public void OnGameEnd()
-        {
-            Cleanup();
+            yield break;
         }
     }
-    internal class TimerHandler : IPlayerPickStartHookHandler
+    internal static class TimerHandler
     {
         internal static Coroutine Timer;
-        internal static void Start()
+        internal static IEnumerator Start(IGameModeHandler gm)
         {
             if (Timer != null) { Unbound.Instance.StopCoroutine(Timer); }
             if (PickTimer.PickTimerTime > 0)
             {
                 Timer = Unbound.Instance.StartCoroutine(PickTimerHandler.StartPickTimer(CardChoice.instance));
             }
-        }
-
-        public void OnPlayerPickStart()
-        {
-            Start();
+            yield break;
         }
     }
     [Serializable]
