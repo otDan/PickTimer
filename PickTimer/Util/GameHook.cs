@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnboundLib.GameModes;
 using UnityEngine;
@@ -226,7 +227,7 @@ namespace PickTimer.Util
 
     internal interface IGameStartHookHandler
     {
-        public abstract void OnGameStart();
+        public abstract Func<IGameModeHandler, IEnumerator> OnGameStart();
         void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps);
         void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps);
     }

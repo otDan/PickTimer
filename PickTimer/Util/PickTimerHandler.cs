@@ -58,14 +58,12 @@ namespace PickTimer.Util
                 float progress = timerTime > 0 ? timerTimerForProgress / PickTimer.PickTimerTime : 0;
                 // UnityEngine.Debug.Log($"Progress: {timerTime}/{PickTimer.PickTimerTime} value {progress}");
                 _progressImage.fillAmount = progress;
-                if (timerTime <= 3)
-                {
-                    _timerText.color = Color.red;
-                }
-                else if (timerTime <= 5)
-                {
-                    _timerText.color = Color.yellow;
-                }
+
+                _timerText.color = timerTime switch {
+                    <= 3 => Color.red,
+                    <= 5 => Color.yellow,
+                    _ => _timerText.color
+                };
                 yield return null;
             }
             TimerCanvas.SetActive(false);
@@ -104,6 +102,7 @@ namespace PickTimer.Util
     internal static class TimerHandler
     {
         internal static Coroutine Timer;
+
         internal static IEnumerator Start(IGameModeHandler gm)
         {
             if (Timer != null) { Unbound.Instance.StopCoroutine(Timer); }

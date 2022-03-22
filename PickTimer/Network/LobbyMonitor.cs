@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections;
 using Photon.Pun;
 using PickTimer.Asset;
 using PickTimer.Util;
 using TMPro;
 using UnboundLib;
+using UnboundLib.GameModes;
 using UnityEngine;
 using UnityEngine.UI;
 using Hashtable = System.Collections.Hashtable;
 
 namespace PickTimer.Network
 {
-    public class LobbyMonitor : MonoBehaviourPunCallbacks, IGameStartHookHandler, IPickStartHookHandler
+    public class LobbyMonitor : MonoBehaviourPunCallbacks
     {
         public static LobbyMonitor instance { get; private set; }
         private static bool _enabled;
@@ -23,7 +25,7 @@ namespace PickTimer.Network
         private void Awake()
         {
             instance = this;
-            InitializeLobbyTimerUi();
+            GameModeManager.AddHook(GameModeHooks.HookGameStart, OnGameStart());
             // GameHook.instance.RegisterHooks(this);
         }
 
@@ -43,6 +45,8 @@ namespace PickTimer.Network
 
         public override void OnJoinedRoom()
         {
+            InitializeLobbyTimerUi();
+
             _lobbyTimerUi.SetActive(false);
             if (PhotonNetwork.OfflineMode) return;
 
@@ -75,6 +79,8 @@ namespace PickTimer.Network
 
         private static void InitializeLobbyTimerUi()
         {
+            if (_lobbyTimerUi == null) return;
+
             LobbyTimerCanvas = GameObject.Find("/Game/UI/UI_Game/Canvas/");
 
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, LobbyTimerCanvas.transform, true);
@@ -127,23 +133,14 @@ namespace PickTimer.Network
             _lobbyTimerUi.SetActive(false);
         }
 
-        public void OnGameStart()
+        public Func<IGameModeHandler, IEnumerator> OnGameStart()
         {
             _lobbyTimerUi.SetActive(false);
+            return null;
         }
-
-        public void OnPickStart()
-        {
-            _lobbyTimerUi.SetActive(false);
-        }
-
+        
         public void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)
         {
         }
-
-        // private void OnDestroy()
-        // {
-        //     GameHook.instance.RemoveHooks(this);
-        // }
     }
 }
