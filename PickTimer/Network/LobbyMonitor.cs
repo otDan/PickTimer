@@ -25,8 +25,11 @@ namespace PickTimer.Network
         private void Awake()
         {
             instance = this;
-
             InitializeLobbyTimerUi();
+        }
+
+        private void Start()
+        {
             GameHook.instance.RegisterHooks(this);
         }
 
@@ -122,9 +125,10 @@ namespace PickTimer.Network
 
         private class BringBgToTop : MonoBehaviour
         {
-            private void OnTransformChildrenChanged()
+            private void Update()
             {
-                this.ExecuteAfterFrames(1, () => _lobbyTimerUi.transform.SetAsLastSibling());
+                if (_lobbyTimerUi.transform.GetSiblingIndex() != 21)
+                    _lobbyTimerUi.transform.SetSiblingIndex(21);
             }
         }
 
