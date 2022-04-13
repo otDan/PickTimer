@@ -10,6 +10,7 @@
 ## Versions
 - 2.0.1
   - Performance fix
+  - Stop animation from blocking buttons in lobby
 - 2.0.0
   - Improved visuals
   - Added ticking sounds with variations

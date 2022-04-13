@@ -88,7 +88,6 @@ namespace PickTimer.Network
             var gameCanvas = GameObject.Find("/Game/UI").transform.Find("UI_Game").Find("Canvas").gameObject;
 
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, gameCanvas.transform);
-            // _lobbyTimerUi.AddComponent<BringBgToTop>();
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
@@ -139,15 +138,6 @@ namespace PickTimer.Network
             _lobbyTimerUi.SetActive(true);
             _enabled = true;
         }
-        //
-        // private class BringBgToTop : MonoBehaviour
-        // {
-        //     private void Update()
-        //     {
-        //         if (_lobbyTimerUi.transform.GetSiblingIndex() != 21)
-        //             
-        //     }
-        // }
 
         public void OnGameStart()
         {
