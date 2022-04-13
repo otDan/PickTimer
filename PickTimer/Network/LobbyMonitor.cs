@@ -19,13 +19,13 @@ namespace PickTimer.Network
         private static TextMeshProUGUI _lobbyTimerText;
         internal static GameObject LobbyTimerCanvas;
         private static GameObject _lobbyTimerUi;
+        // private static GameObject _lobbyTimerParticles;
         private static Button _minusButton;
         private static Button _plusButton;
 
         private void Awake()
         {
             instance = this;
-            InitializeLobbyTimerUi();
         }
 
         private void Start()
@@ -36,7 +36,6 @@ namespace PickTimer.Network
         private void Update()
         {
             if (!_enabled) return;
-
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
         }
 
@@ -49,8 +48,12 @@ namespace PickTimer.Network
 
         public override void OnJoinedRoom()
         {
+            if (!PickTimer.PickTimerEnabled) return;
+
             if (_lobbyTimerUi == null)
+            {
                 InitializeLobbyTimerUi();
+            }
 
             _lobbyTimerUi.SetActive(false);
             if (PhotonNetwork.OfflineMode) return;
@@ -60,6 +63,12 @@ namespace PickTimer.Network
             if (PhotonNetwork.IsMasterClient) return;
             _minusButton.gameObject.SetActive(false);
             _plusButton.gameObject.SetActive(false);
+        }
+
+        public override void OnLeftRoom()
+        {
+            Destroy(_lobbyTimerUi);
+            _enabled = false;
         }
 
         private static void IncrementPickTimerValue()
@@ -95,14 +104,27 @@ namespace PickTimer.Network
             _lobbyTimerText.overflowMode = TextOverflowModes.Overflow;
             _lobbyTimerText.alignment = TextAlignmentOptions.Center;
 
-            RectTransform rect = _lobbyTimerUi.GetComponent<RectTransform>();
-            rect.localScale = new Vector3(0.8f, 0.8f, 1);
-            rect.anchorMin = new Vector2(0, 0);
-            rect.anchorMax = new Vector2(1, 1);
-            rect.pivot = new Vector2(1f, 1f);
-            rect.offsetMin = new Vector2(0, 0);
-            rect.offsetMax = new Vector2(0, 0);
-            rect.localPosition = new Vector3(769, 880, 0);
+            RectTransform canvasRectTransform = LobbyTimerCanvas.GetComponent<RectTransform>();
+
+            RectTransform lobbyTimerUiRect = _lobbyTimerUi.GetComponent<RectTransform>();
+            lobbyTimerUiRect.localScale = new Vector3(0.8f, 0.8f, 1);
+            lobbyTimerUiRect.anchorMin = new Vector2(0, 0);
+            lobbyTimerUiRect.anchorMax = new Vector2(1, 1);
+            lobbyTimerUiRect.pivot = new Vector2(1f, 1f);
+            lobbyTimerUiRect.offsetMin = new Vector2(0, 0);
+            lobbyTimerUiRect.offsetMax = new Vector2(0, 0);
+            var lobbyTimerX = canvasRectTransform.rect.width / 2 - lobbyTimerUiRect.rect.width / 2;
+            lobbyTimerUiRect.localPosition = new Vector3(lobbyTimerX, 0, 0);
+
+            // _lobbyTimerParticles = Instantiate(AssetManager.TimerParticles, _lobbyTimerUi.transform, true);
+            // RectTransform lobbyTimerParticlesRect = _lobbyTimerParticles.GetComponent<RectTransform>();
+            // lobbyTimerParticlesRect.localScale = new Vector3(0.1f, 0.1f, 1);
+            // lobbyTimerParticlesRect.anchorMin = new Vector2(0, 0);
+            // lobbyTimerParticlesRect.anchorMax = new Vector2(1, 1);
+            // lobbyTimerParticlesRect.pivot = new Vector2(1f, 1f);
+            // lobbyTimerParticlesRect.offsetMin = new Vector2(0, 0);
+            // lobbyTimerParticlesRect.offsetMax = new Vector2(0, 0);
+            // lobbyTimerParticlesRect.localPosition = new Vector3(0, 0, 0);
 
             foreach (var button in _lobbyTimerUi.gameObject.GetComponentsInChildren<Button>())
             {
@@ -130,11 +152,6 @@ namespace PickTimer.Network
                 if (_lobbyTimerUi.transform.GetSiblingIndex() != 21)
                     _lobbyTimerUi.transform.SetSiblingIndex(21);
             }
-        }
-
-        public override void OnLeftRoom()
-        {
-            _lobbyTimerUi.SetActive(false);
         }
 
         public void OnGameStart()

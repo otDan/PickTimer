@@ -27,6 +27,7 @@ namespace PickTimer
         private const string CompatibilityModName = "PickTimer";
         public static PickTimer Instance { get; private set; }
         public static int PickTimerTime;
+        public static bool PickTimerEnabled;
 
         private void Awake()
         {
@@ -44,40 +45,48 @@ namespace PickTimer
         {
             MenuManager.Initialize();
 
-            PickTimerTime = ConfigManager.PickTimerConfig.Value;
+            PickTimerEnabled = ConfigController.TimerEnabledConfig.Value;
+            PickTimerTime = ConfigController.TimerTimerConfig.Value;
 
             gameObject.AddComponent<GameHook>();
             gameObject.AddComponent<LobbyMonitor>();
 
             GameModeManager.AddHook(GameModeHooks.HookPlayerPickStart, TimerHandler.Start);
-            GameModeManager.AddHook(GameModeHooks.HookPlayerPickEnd, PickTimerHandler.Cleanup);
-            GameModeManager.AddHook(GameModeHooks.HookGameEnd, PickTimerHandler.Cleanup);
+            GameModeManager.AddHook(GameModeHooks.HookPlayerPickEnd, PickTimerController.Cleanup);
+            GameModeManager.AddHook(GameModeHooks.HookGameEnd, PickTimerController.Cleanup);
 
             Unbound.RegisterHandshake(ModId, OnHandShakeCompleted);
+
+            AudioController.LoadClips();
         }
 
         private void SetupConfig()
         {
-            ConfigManager.PickTimerConfig = Config.Bind(CompatibilityModName, "PickTimer", 0, "Pick Timer Time");
+            ConfigController.TimerEnabledConfig = Config.Bind(CompatibilityModName, "PickTimer_Enabled", true, "Pick Timer Enabled");
+            ConfigController.TimerTimerConfig = Config.Bind(CompatibilityModName, "PickTimer_Time", 15, "Pick Timer Time");
+            ConfigController.TimerVolumeConfig = Config.Bind(CompatibilityModName, "PickTimer_AudioVolume", 0.75f, "Pick Timer Audio Volume");
         }
 
         public static void SyncTimer()
         {
-            NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), PickTimerTime);
+            NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), PickTimerEnabled, PickTimerTime);
         }
 
         private static void OnHandShakeCompleted()
         {
             if (PhotonNetwork.IsMasterClient)
             {
-                SyncTimer();   
+                SyncTimer();
             }
         }
 
         [UnboundRPC]
-        private static void SyncSettings(int pickTimer)
+        private static void SyncSettings(bool pickTimerEnabled, int pickTimerTime)
         {
-            PickTimerTime = pickTimer;
+            PickTimerEnabled = pickTimerEnabled;
+            PickTimerTime = pickTimerTime;
+
+            LobbyMonitor.instance.OnJoinedRoom();
         }
     }
 }

@@ -12,17 +12,18 @@ using Object = UnityEngine.Object;
 
 namespace PickTimer.Util
 {
-    internal static class PickTimerHandler
+    internal static class PickTimerController
     {
         private static readonly System.Random Random = new();
-        private static GameObject _timerUi;
+        internal static GameObject TimerUi;
         private static Image _progressImage;
         private static TextMeshProUGUI _timerText;
-        internal static GameObject TimerCanvas;
         internal static Coroutine TimerCr;
+        private static int _oldTimerTime = -1;
 
         internal static IEnumerator StartPickTimer(CardChoice instance)
         {
+            if (!PickTimer.PickTimerEnabled) yield break;
             if (TimerCr != null)
             {
                 Unbound.Instance.StopCoroutine(TimerCr);
@@ -40,19 +41,26 @@ namespace PickTimer.Util
 
         private static IEnumerator Timer(float timeToWait)
         {
+            if (!PickTimer.PickTimerEnabled) yield break;
             float start = Time.time;
             if (_timerText == null)
             {
                 InitializeTimerUi();
             }
             _timerText.color = Color.white;
-            TimerCanvas.SetActive(true);
+            TimerUi.SetActive(true);
+            _oldTimerTime = -1;
 
             while (Time.time < start + timeToWait)
             {
                 float timerTimerForProgress = start + timeToWait - Time.time;
                 int timerTime = Mathf.CeilToInt(timerTimerForProgress);
-                
+                if (_oldTimerTime != timerTime)
+                {
+                    _oldTimerTime = timerTime;
+                    AudioController.PlayRandomTickClip(TimerUi.transform);
+                }
+
                 _timerText.text = timerTime.ToString();
 
                 float progress = timerTime > 0 ? timerTimerForProgress / PickTimer.PickTimerTime : 0;
@@ -66,37 +74,51 @@ namespace PickTimer.Util
                 };
                 yield return null;
             }
-            TimerCanvas.SetActive(false);
+
+            TimerUi.SetActive(false);
         }
 
         private static void InitializeTimerUi()
         {
-            TimerCanvas = new GameObject("TimerCanvas", typeof(Canvas));
-            TimerCanvas.transform.SetParent(Unbound.Instance.canvas.transform);
+            var gameCanvas = GameObject.Find("/Game/UI").transform.Find("UI_Game").Find("Canvas").gameObject;
 
-            _timerUi = Object.Instantiate(AssetManager.TimerUI, TimerCanvas.transform, true);
-            _timerText = _timerUi.GetComponentInChildren<TextMeshProUGUI>();
+            TimerUi = Object.Instantiate(AssetManager.TimerUI, gameCanvas.transform);
+
+            var rect = TimerUi.GetOrAddComponent<RectTransform>();
+            rect.localScale = Vector3.one;
+            rect.offsetMax = new Vector2(0, -(Screen.width / 4f));
+
+            var fitter = TimerUi.GetOrAddComponent<ContentSizeFitter>();
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            // TimerCanvas = new GameObject("TimerCanvas", typeof(Canvas));
+            // TimerCanvas.transform.SetParent(Unbound.Instance.canvas.transform);
+            // TimerCanvas.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            // TimerCanvas.transform.localScale = new Vector3(0.25f, 0.25f, 0);
+            
+            _timerText = TimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _timerText.text = "";
             _timerText.fontSize = 200f;
             _timerText.enableWordWrapping = false;
             _timerText.overflowMode = TextOverflowModes.Overflow;
             _timerText.alignment = TextAlignmentOptions.Center;
 
-            _progressImage = _timerUi.transform.Find("Timer/TimerFillImage").gameObject.GetComponent<Image>();
+            _progressImage = TimerUi.transform.Find("Timer/TimerFillImage").gameObject.GetComponent<Image>();
 
-            TimerCanvas.transform.position = new Vector2(Screen.width / 2f, 150f);
-            TimerCanvas.SetActive(false);
+            // TimerCanvas.transform.position = new Vector2(, 150f);
+            TimerUi.SetActive(false);
         }
 
         internal static IEnumerator Cleanup(IGameModeHandler gm)
         {
+            if (!PickTimer.PickTimerEnabled) yield break;
             if (TimerHandler.Timer != null) { Unbound.Instance.StopCoroutine(TimerHandler.Timer); }
             if (TimerCr != null)
             {
                 Unbound.Instance.StopCoroutine(TimerCr);
             }
-            if (TimerCanvas != null) { TimerCanvas.SetActive(false); }
-            yield break;
+            if (TimerUi != null) { TimerUi.SetActive(false); }
         }
     }
     internal static class TimerHandler
@@ -105,12 +127,12 @@ namespace PickTimer.Util
 
         internal static IEnumerator Start(IGameModeHandler gm)
         {
+            if (!PickTimer.PickTimerEnabled) yield break;
             if (Timer != null) { Unbound.Instance.StopCoroutine(Timer); }
             if (PickTimer.PickTimerTime > 0)
             {
-                Timer = Unbound.Instance.StartCoroutine(PickTimerHandler.StartPickTimer(CardChoice.instance));
+                Timer = Unbound.Instance.StartCoroutine(PickTimerController.StartPickTimer(CardChoice.instance));
             }
-            yield break;
         }
     }
     [Serializable]
@@ -119,13 +141,14 @@ namespace PickTimer.Util
     {
         private static void Postfix(CardChoice __instance)
         {
-            if (PickTimerHandler.TimerCanvas != null && PickTimerHandler.TimerCanvas.gameObject.activeInHierarchy)
+            if (!PickTimer.PickTimerEnabled) return;
+            if (PickTimerController.TimerUi != null && PickTimerController.TimerUi.gameObject.activeInHierarchy)
             {
-                PickTimerHandler.TimerCanvas.gameObject.SetActive(false);
+                PickTimerController.TimerUi.SetActive(false);
             }
-            if (PickTimerHandler.TimerCr != null)
+            if (PickTimerController.TimerCr != null)
             {
-                Unbound.Instance.StopCoroutine(PickTimerHandler.TimerCr);
+                Unbound.Instance.StopCoroutine(PickTimerController.TimerCr);
             }
             if (TimerHandler.Timer != null)
             {
