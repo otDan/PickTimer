@@ -17,7 +17,7 @@ namespace PickTimer.Network
         public static LobbyMonitor instance { get; private set; }
         private static bool _enabled;
         private static TextMeshProUGUI _lobbyTimerText;
-        internal static GameObject LobbyTimerCanvas;
+        // internal static GameObject LobbyTimerCanvas;
         private static GameObject _lobbyTimerUi;
         // private static GameObject _lobbyTimerParticles;
         private static Button _minusButton;
@@ -50,19 +50,10 @@ namespace PickTimer.Network
         {
             if (!PickTimer.PickTimerEnabled) return;
 
-            if (_lobbyTimerUi == null)
-            {
-                InitializeLobbyTimerUi();
-            }
+            InitializeLobbyTimerUi();
 
+            if (!PhotonNetwork.OfflineMode) return;
             _lobbyTimerUi.SetActive(false);
-            if (PhotonNetwork.OfflineMode) return;
-
-            _lobbyTimerUi.SetActive(true);
-
-            if (PhotonNetwork.IsMasterClient) return;
-            _minusButton.gameObject.SetActive(false);
-            _plusButton.gameObject.SetActive(false);
         }
 
         public override void OnLeftRoom()
@@ -91,21 +82,20 @@ namespace PickTimer.Network
             PickTimer.SyncTimer();
         }
 
-        private static void InitializeLobbyTimerUi()
+        public static void InitializeLobbyTimerUi()
         {
-            LobbyTimerCanvas = GameObject.Find("/Game/UI/UI_Game/Canvas/");
+            if (_lobbyTimerUi != null) return;
+            var gameCanvas = GameObject.Find("/Game/UI").transform.Find("UI_Game").Find("Canvas").gameObject;
 
-            _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, LobbyTimerCanvas.transform, true);
-            _lobbyTimerUi.AddComponent<BringBgToTop>();
+            _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, gameCanvas.transform);
+            // _lobbyTimerUi.AddComponent<BringBgToTop>();
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
             _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
             _lobbyTimerText.enableWordWrapping = false;
             _lobbyTimerText.overflowMode = TextOverflowModes.Overflow;
             _lobbyTimerText.alignment = TextAlignmentOptions.Center;
-
-            RectTransform canvasRectTransform = LobbyTimerCanvas.GetComponent<RectTransform>();
-
+            
             RectTransform lobbyTimerUiRect = _lobbyTimerUi.GetComponent<RectTransform>();
             lobbyTimerUiRect.localScale = new Vector3(0.8f, 0.8f, 1);
             lobbyTimerUiRect.anchorMin = new Vector2(0, 0);
@@ -113,7 +103,7 @@ namespace PickTimer.Network
             lobbyTimerUiRect.pivot = new Vector2(1f, 1f);
             lobbyTimerUiRect.offsetMin = new Vector2(0, 0);
             lobbyTimerUiRect.offsetMax = new Vector2(0, 0);
-            var lobbyTimerX = canvasRectTransform.rect.width / 2 - lobbyTimerUiRect.rect.width / 2;
+            var lobbyTimerX = gameCanvas.GetComponent<RectTransform>().rect.width / 2 - lobbyTimerUiRect.rect.width / 2;
             lobbyTimerUiRect.localPosition = new Vector3(lobbyTimerX, 0, 0);
 
             // _lobbyTimerParticles = Instantiate(AssetManager.TimerParticles, _lobbyTimerUi.transform, true);
@@ -140,23 +130,28 @@ namespace PickTimer.Network
                         break;
                 }
             }
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                _minusButton.gameObject.SetActive(false);
+                _plusButton.gameObject.SetActive(false);
+            }
 
-            _lobbyTimerUi.SetActive(false);
+            _lobbyTimerUi.SetActive(true);
             _enabled = true;
         }
-
-        private class BringBgToTop : MonoBehaviour
-        {
-            private void Update()
-            {
-                if (_lobbyTimerUi.transform.GetSiblingIndex() != 21)
-                    _lobbyTimerUi.transform.SetSiblingIndex(21);
-            }
-        }
+        //
+        // private class BringBgToTop : MonoBehaviour
+        // {
+        //     private void Update()
+        //     {
+        //         if (_lobbyTimerUi.transform.GetSiblingIndex() != 21)
+        //             
+        //     }
+        // }
 
         public void OnGameStart()
         {
-            _lobbyTimerUi.SetActive(false);
+            Destroy(_lobbyTimerUi);
         }
         
         public void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, Hashtable changedProps)

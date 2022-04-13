@@ -22,7 +22,7 @@ namespace PickTimer
     {
         private const string ModId = "ot.dan.rounds.picktimer";
         private const string ModName = "Pick Timer";
-        public const string Version = "2.0.0";
+        public const string Version = "2.0.1";
         public const string ModInitials = "PT";
         private const string CompatibilityModName = "PickTimer";
         public static PickTimer Instance { get; private set; }
@@ -86,7 +86,7 @@ namespace PickTimer
             PickTimerEnabled = pickTimerEnabled;
             PickTimerTime = pickTimerTime;
 
-            LobbyMonitor.instance.OnJoinedRoom();
+            LobbyMonitor.InitializeLobbyTimerUi();
         }
     }
 }

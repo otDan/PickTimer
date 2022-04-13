@@ -8,6 +8,8 @@
 </p>
 
 ## Versions
+- 2.0.1
+  - Performance fix
 - 2.0.0
   - Improved visuals
   - Added ticking sounds with variations
