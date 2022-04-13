@@ -8,6 +8,10 @@
 </p>
 
 ## Versions
+- 2.0.0
+  - Improved visuals
+  - Added ticking sounds with variations
+  - Added timer in the lobby with changable settings
 - 1.1.0
   - New in lobby UI 
 - 1.0.1

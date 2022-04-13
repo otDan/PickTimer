@@ -1,6 +1,6 @@
 {
     "name": "PickTimer",
-    "version_number": "1.1.0",
+    "version_number": "2.0.0",
     "website_url": "https://github.com/otDan/PickTimer",
     "description": "Add a timer in the pick phase that stops people from going afk.",
     "dependencies": [
