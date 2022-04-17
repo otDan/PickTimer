@@ -21,27 +21,41 @@ namespace PickTimer.Util
         internal static Coroutine TimerCr;
         private static int _oldTimerTime = -1;
 
+        public static bool InPickPhase;
+        public static int CurrentPicks;
+
         internal static IEnumerator StartPickTimer(CardChoice instance)
         {
-            if (!PickTimer.PickTimerEnabled) yield break;
+            if (!ConfigController.PickTimerEnabled) yield break;
             if (TimerCr != null)
             {
                 Unbound.Instance.StopCoroutine(TimerCr);
             }
 
-            TimerCr = Unbound.Instance.StartCoroutine(Timer(PickTimer.PickTimerTime));
-            yield return new WaitForSecondsRealtime(PickTimer.PickTimerTime);
+            yield return new WaitWhile(() => !InPickPhase);
+            TimerCr = Unbound.Instance.StartCoroutine(Timer(ConfigController.PickTimerTime));
+            yield return new WaitForSecondsRealtime(ConfigController.PickTimerTime);
 
             var traverse = Traverse.Create(instance);
-            var spawnedCards = (List<GameObject>) traverse.Field("spawnedCards").GetValue();
 
-            instance.Pick(spawnedCards [Random.Next(0, spawnedCards.Count)]);
+            var spawnedCards = (List<GameObject>)traverse.Field("spawnedCards").GetValue();
+            if (ConfigController.PickTimerPunish)
+            {
+                int selectedCard = (int)instance.GetFieldValue("currentlySelectedCard");
+                instance.Pick(spawnedCards[selectedCard]);
+            }
+            else
+            {
+                instance.Pick(spawnedCards[Random.Next(0, spawnedCards.Count)]);
+            }
+
             traverse.Field("pickrID").SetValue(-1);
         }
 
         private static IEnumerator Timer(float timeToWait)
         {
-            if (!PickTimer.PickTimerEnabled) yield break;
+            if (!ConfigController.PickTimerEnabled) yield break;
+
             float start = Time.time;
             if (_timerText == null)
             {
@@ -63,7 +77,7 @@ namespace PickTimer.Util
 
                 _timerText.text = timerTime.ToString();
 
-                float progress = timerTime > 0 ? timerTimerForProgress / PickTimer.PickTimerTime : 0;
+                float progress = timerTime > 0 ? timerTimerForProgress / ConfigController.PickTimerTime : 0;
                 // UnityEngine.Debug.Log($"Progress: {timerTime}/{PickTimer.PickTimerTime} value {progress}");
                 _progressImage.fillAmount = progress;
 
@@ -112,7 +126,9 @@ namespace PickTimer.Util
 
         internal static IEnumerator Cleanup(IGameModeHandler gm)
         {
-            if (!PickTimer.PickTimerEnabled) yield break;
+            if (!ConfigController.PickTimerEnabled) yield break;
+            InPickPhase = false;
+            CurrentPicks = 0;
             if (TimerHandler.Timer != null) { Unbound.Instance.StopCoroutine(TimerHandler.Timer); }
             if (TimerCr != null)
             {
@@ -127,9 +143,13 @@ namespace PickTimer.Util
 
         internal static IEnumerator Start(IGameModeHandler gm)
         {
-            if (!PickTimer.PickTimerEnabled) yield break;
+            if (!ConfigController.PickTimerEnabled) yield break;
+
+            PickTimerController.InPickPhase = false;
+            PickTimerController.CurrentPicks = 0;
             if (Timer != null) { Unbound.Instance.StopCoroutine(Timer); }
-            if (PickTimer.PickTimerTime > 0)
+
+            if (ConfigController.PickTimerTime > 0)
             {
                 Timer = Unbound.Instance.StartCoroutine(PickTimerController.StartPickTimer(CardChoice.instance));
             }
@@ -141,7 +161,7 @@ namespace PickTimer.Util
     {
         private static void Postfix(CardChoice __instance)
         {
-            if (!PickTimer.PickTimerEnabled) return;
+            if (!ConfigController.PickTimerEnabled) return;
             if (PickTimerController.TimerUi != null && PickTimerController.TimerUi.gameObject.activeInHierarchy)
             {
                 PickTimerController.TimerUi.SetActive(false);

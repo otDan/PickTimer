@@ -8,6 +8,8 @@
 </p>
 
 ## Versions
+- 2.1.0
+  - Timer starts when first card is drawn to ensure sync
 - 2.0.1
   - Performance fix
   - Stop animation from blocking buttons in lobby

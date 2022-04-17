@@ -13,6 +13,8 @@ namespace PickTimer
 {
     // These are the mods required for our mod to work
     [BepInDependency("com.willis.rounds.unbound")]
+    [BepInDependency("pykess.rounds.plugins.moddingutils")]
+    [BepInDependency("pykess.rounds.plugins.pickncards")]
     [BepInIncompatibility("pykess.rounds.plugins.competitiverounds")]
     // Declares our mod to Bepin
     [BepInPlugin(ModId, ModName, Version)]
@@ -22,12 +24,10 @@ namespace PickTimer
     {
         private const string ModId = "ot.dan.rounds.picktimer";
         private const string ModName = "Pick Timer";
-        public const string Version = "2.0.1";
+        public const string Version = "2.1.0";
         public const string ModInitials = "PT";
         private const string CompatibilityModName = "PickTimer";
         public static PickTimer Instance { get; private set; }
-        public static int PickTimerTime;
-        public static bool PickTimerEnabled;
 
         private void Awake()
         {
@@ -45,8 +45,8 @@ namespace PickTimer
         {
             MenuManager.Initialize();
 
-            PickTimerEnabled = ConfigController.TimerEnabledConfig.Value;
-            PickTimerTime = ConfigController.TimerTimerConfig.Value;
+            ConfigController.PickTimerEnabled = ConfigController.TimerEnabledConfig.Value;
+            ConfigController.PickTimerTime = ConfigController.TimerTimerConfig.Value;
 
             gameObject.AddComponent<GameHook>();
             gameObject.AddComponent<LobbyMonitor>();
@@ -64,12 +64,13 @@ namespace PickTimer
         {
             ConfigController.TimerEnabledConfig = Config.Bind(CompatibilityModName, "PickTimer_Enabled", true, "Pick Timer Enabled");
             ConfigController.TimerTimerConfig = Config.Bind(CompatibilityModName, "PickTimer_Time", 15, "Pick Timer Time");
+            ConfigController.TimerPunishConfig = Config.Bind(CompatibilityModName, "PickTimer_Punish", true, "Pick Timer Punish");
             ConfigController.TimerVolumeConfig = Config.Bind(CompatibilityModName, "PickTimer_AudioVolume", 0.75f, "Pick Timer Audio Volume");
         }
 
         public static void SyncTimer()
         {
-            NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), PickTimerEnabled, PickTimerTime);
+            NetworkingManager.RPC_Others(typeof(PickTimer), nameof(SyncSettings), ConfigController.PickTimerEnabled, ConfigController.PickTimerTime, ConfigController.PickTimerPunish);
         }
 
         private static void OnHandShakeCompleted()
@@ -81,10 +82,11 @@ namespace PickTimer
         }
 
         [UnboundRPC]
-        private static void SyncSettings(bool pickTimerEnabled, int pickTimerTime)
+        private static void SyncSettings(bool pickTimerEnabled, int pickTimerTime, bool pickTimerPunish)
         {
-            PickTimerEnabled = pickTimerEnabled;
-            PickTimerTime = pickTimerTime;
+            ConfigController.PickTimerEnabled = pickTimerEnabled;
+            ConfigController.PickTimerTime = pickTimerTime;
+            ConfigController.PickTimerPunish = pickTimerPunish;
 
             LobbyMonitor.InitializeLobbyTimerUi();
         }

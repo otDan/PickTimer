@@ -36,7 +36,7 @@ namespace PickTimer.Network
         private void Update()
         {
             if (!_enabled) return;
-            _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
+            _lobbyTimerText.text = ConfigController.PickTimerTime.ToString();
         }
 
         public override void OnCreatedRoom()
@@ -48,7 +48,7 @@ namespace PickTimer.Network
 
         public override void OnJoinedRoom()
         {
-            if (!PickTimer.PickTimerEnabled) return;
+            if (!ConfigController.PickTimerEnabled) return;
 
             InitializeLobbyTimerUi();
 
@@ -64,9 +64,9 @@ namespace PickTimer.Network
 
         private static void IncrementPickTimerValue()
         {
-            if (PickTimer.PickTimerTime + 1 <= 60)
+            if (ConfigController.PickTimerTime + 1 <= 60)
             {
-                PickTimer.PickTimerTime += 1;
+                ConfigController.PickTimerTime += 1;
             }
 
             PickTimer.SyncTimer();
@@ -74,9 +74,9 @@ namespace PickTimer.Network
 
         private static void DecrementPickTimerValue()
         {
-            if (PickTimer.PickTimerTime - 1 >= 5)
+            if (ConfigController.PickTimerTime - 1 >= 5)
             {
-                PickTimer.PickTimerTime -= 1;
+                ConfigController.PickTimerTime -= 1;
             }
 
             PickTimer.SyncTimer();
@@ -90,7 +90,7 @@ namespace PickTimer.Network
             _lobbyTimerUi = Instantiate(AssetManager.TimerLobbyUI, gameCanvas.transform);
 
             _lobbyTimerText = _lobbyTimerUi.GetComponentInChildren<TextMeshProUGUI>();
-            _lobbyTimerText.text = PickTimer.PickTimerTime.ToString();
+            _lobbyTimerText.text = ConfigController.PickTimerTime.ToString();
             _lobbyTimerText.enableWordWrapping = false;
             _lobbyTimerText.overflowMode = TextOverflowModes.Overflow;
             _lobbyTimerText.alignment = TextAlignmentOptions.Center;

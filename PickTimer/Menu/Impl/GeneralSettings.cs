@@ -17,16 +17,31 @@ namespace PickTimer.Menu.Impl
             void TimerEnabled(bool val)
             {
                 ConfigController.TimerEnabledConfig.Value = val;
-                PickTimer.PickTimerEnabled = ConfigController.TimerEnabledConfig.Value;
+                ConfigController.PickTimerEnabled = ConfigController.TimerEnabledConfig.Value;
             }
-            MenuHandler.CreateToggle(PickTimer.PickTimerEnabled, "Enabled", menu, TimerEnabled, 30);
-            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 5);
+            MenuHandler.CreateToggle(ConfigController.PickTimerEnabled, "Enabled", menu, TimerEnabled, 30);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 10);
+            MenuHandler.CreateText("<i><color=#9e9e9e>Have a timer in the pick phase that picks a card once it ends.</color></i>", menu, out TextMeshProUGUI _, 18);
+
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 25);
             void TimerChanged(float val)
             {
                 ConfigController.TimerTimerConfig.Value = Mathf.RoundToInt(val);
-                PickTimer.PickTimerTime = ConfigController.TimerTimerConfig.Value;
+                ConfigController.PickTimerTime = ConfigController.TimerTimerConfig.Value;
             }
             MenuHandler.CreateSlider("Seconds", menu, 30, 5f, 60f, ConfigController.TimerTimerConfig.Value, TimerChanged, out _, true);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 10);
+            MenuHandler.CreateText("<i><color=#9e9e9e>Seconds on the pick phase timer.</color></i>", menu, out TextMeshProUGUI _, 18);
+
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 25);
+            void PunishEnabled(bool val)
+            {
+                ConfigController.TimerPunishConfig.Value = val;
+                ConfigController.PickTimerPunish = ConfigController.TimerPunishConfig.Value;
+            }
+            MenuHandler.CreateToggle(ConfigController.PickTimerEnabled, "Punish Player", menu, PunishEnabled, 30);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 10);
+            MenuHandler.CreateText("<i><color=#9e9e9e>Punish the player by picking a random card instead of the one he is on.</color></i>", menu, out TextMeshProUGUI _, 18);
 
             MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 25);
             void GlobalVolAction(float val)
@@ -34,6 +49,8 @@ namespace PickTimer.Menu.Impl
                 ConfigController.TimerVolumeConfig.Value = val;
             }
             MenuHandler.CreateSlider("Audio Volume", menu, 30, 0f, 1f, ConfigController.TimerVolumeConfig.Value, new UnityAction<float>(GlobalVolAction), out Slider slider, false, null, Slider.Direction.LeftToRight, true, null, null, null, null);
+            MenuHandler.CreateText(" ", menu, out TextMeshProUGUI _, 10);
+            MenuHandler.CreateText("<i><color=#9e9e9e>Timer ticking sound volume.</color></i>", menu, out TextMeshProUGUI _, 18);
         }
     }
 }
